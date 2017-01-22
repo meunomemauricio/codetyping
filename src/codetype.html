@@ -1,0 +1,39 @@
+<!-- template for the popup component -->
+<script type="text/x-template" id="popup-template">
+  <div class="popup-mask">
+    <div class="popup-body">
+      <div class="popup-text">{{ message }}</div><!--
+   --><div class="popup-subtext" v-if="subtext">{{ subtext }}</div>
+    </div>
+  </div>
+</script>
+
+<html>
+  <head>
+    <title>Code Typing</title>
+    <link rel="stylesheet" type="text/css" href="codetype.css">
+
+    <!-- Load external fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+  </head>
+
+  <body>
+
+    <div id="app">
+      <div class="score-display">
+        <p>Typed: {{ score.typed }} | Correct: {{ score.correct }} | Left: {{ score.left }} | Typos: {{ score.typos }}</p>
+      </div>
+      <div class="text-display" tabindex="0" @keydown="doInput" @focus="activate" @blur="deactivate" >
+        <span v-for="char in typedText" :class="char.classname">{{ char.key }}</span><!--
+     --><span class="current">{{ displayCurrentChar }}</span><!--
+     --><span class="remaining-text">{{ remainingTextDisplay }}</span>
+        <popup message="Paused" subtext="Click to resume..." v-if="showModal">
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+    <script src="codetype.js"></script>
+  </body>
+
+</html>
+
