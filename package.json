@@ -1,0 +1,27 @@
+{
+  "name": "codetyping",
+  "version": "0.1.0",
+  "description": "Tool for Typing practice specialized in Coding and Programming.",
+  "main": "index.js",
+  "scripts": {
+    "test": "./node_modules/karma/bin/karma start karma.conf.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/meunomemauricio/codetyping.git"
+  },
+  "author": "Mauricio Freitas <contato@mauriciofreitas.eng.br>",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/meunomemauricio/codetyping/issues"
+  },
+  "homepage": "https://github.com/meunomemauricio/codetyping#readme",
+  "devDependencies": {
+    "jasmine-core": "^2.5.2",
+    "karma": "^1.4.0",
+    "karma-chrome-launcher": "^2.0.0",
+    "karma-coverage": "^1.1.1",
+    "karma-jasmine": "^1.1.0",
+    "vue": "^2.1.10"
+  }
+}
