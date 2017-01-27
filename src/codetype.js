@@ -12,6 +12,9 @@ var params = '?page=1&per_page=100';
 // Max size of files to be used for typing
 const maxFileSize = 512;
 
+// Stopwatch to calculate WPM
+var sw = new Stopwatch();
+
 
 /**
  * Extract files from each Gist and add to a list;
@@ -172,7 +175,13 @@ var vm = new Vue({
          */
         score: function () {
             if (!this.remainingText) {
-                return {correct: '--', typed: '--', left: '--', typos: '--'}
+                return {
+                    correct: '--',
+                    typed: '--',
+                    left: '--',
+                    typos: '--',
+                    elapsed: '--',
+                }
             }
 
             var left = this.remainingText.length + 1;
@@ -183,6 +192,7 @@ var vm = new Vue({
                 typed: this.typedText.length,
                 left: left,
                 typos: typos,
+                elapsed: sw.elapsed(),
             }
         }
     },
@@ -281,6 +291,7 @@ var vm = new Vue({
          */
         activate: function (event) {
             this.showModal = false;
+            sw.start();
         },
 
         /**
@@ -288,6 +299,7 @@ var vm = new Vue({
          */
         deactivate: function (event) {
             this.showModal = true;
+            sw.pause();
         },
     },
 })
