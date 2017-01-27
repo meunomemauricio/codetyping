@@ -17,20 +17,21 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-        'src/stopwatch.js',
+        'src/*.js',
         'test/unit/*Spec.js',
     ],
 
 
     // list of files to exclude
     exclude: [
+        'src/codetype.js',
     ],
 
 
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      'src/stopwatch.js': 'coverage'
+      'src/*.js': 'coverage'
     },
 
 

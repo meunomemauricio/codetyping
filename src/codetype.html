@@ -21,7 +21,7 @@
 
     <div id="app">
       <div class="score-display">
-        <p>Typed: {{ score.typed }} | Correct: {{ score.correct }} | Left: {{ score.left }} | Typos: {{ score.typos }} | Elapsed: {{ score.elapsed }}</p>
+        <p>Typed: {{ score.typed }} | Correct: {{ score.correct }} | Left: {{ score.left }} | Typos: {{ score.typos }} | Raw WPM: {{ score.rawWPM }} | Net WPM: {{ score.netWPM }}</p>
       </div>
       <div class="text-display" tabindex="0" @keydown="doInput" @focus="activate" @blur="deactivate" >
         <span v-for="char in typedText" :class="char.classname">{{ char.key }}</span><!--
@@ -33,6 +33,7 @@
 
     <script src="https://unpkg.com/vue/dist/vue.js"></script>
     <script src="stopwatch.js"></script>
+    <script src="wpmCalc.js"></script>
     <script src="codetype.js"></script>
   </body>
 

@@ -144,6 +144,7 @@ var vm = new Vue({
     data: {
         codeFiles: [],
         typedText: [],
+        totalTyped: 0,
         remainingText: null,
         currentChar: null,
         active: false,
@@ -180,7 +181,8 @@ var vm = new Vue({
                     typed: '--',
                     left: '--',
                     typos: '--',
-                    elapsed: '--',
+                    rawWPM: '--',
+                    netWPM: '--',
                 }
             }
 
@@ -192,7 +194,8 @@ var vm = new Vue({
                 typed: this.typedText.length,
                 left: left,
                 typos: typos,
-                elapsed: sw.elapsed(),
+                rawWPM: getRawWPM(this.totalTyped, sw.elapsed()),
+                netWPM: getNetWPM(this.totalTyped, typos, sw.elapsed()),
             }
         }
     },
@@ -257,6 +260,7 @@ var vm = new Vue({
                 default:
                     if (isMultipleChars(typedKey)) {return;}
             }
+            this.totalTyped++;
 
             var verifyedItem = verifyTypedKey(this.currentChar, typedKey);
             this.typedText.push(verifyedItem);
@@ -303,3 +307,4 @@ var vm = new Vue({
         },
     },
 })
+
