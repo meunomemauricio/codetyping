@@ -1,5 +1,6 @@
-describe("Stopwatch", function() {
+var Stopwatch = require('../../src/stopwatch.js');
 
+describe("Stopwatch", function() {
     beforeEach(function() {
         jasmine.clock().install();
     });
