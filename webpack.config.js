@@ -5,13 +5,12 @@ module.exports = {
         filename: 'codetyping.js',
     },
     module: {
+        preLoaders: [
+            {test: /\.js$/, loader: 'eslint', exclude: /node_modules/},
+        ],
         loaders: [
-            {
-                test: /\.js$/,
-                loader: 'babel',
-                exclude: /node_modules/
-            },
-        ]
+            {test: /\.js$/, loader: 'babel', exclude: /node_modules/},
+        ],
     },
     resolve: {
         alias: {
@@ -20,5 +19,9 @@ module.exports = {
             // https://vuejs.org/v2/guide/installation.html#Standalone-vs-Runtime-only-Build
             'vue$': 'vue/dist/vue.common.js'
         }
-    }
+    },
+    eslint: {
+        failOnWarning: false,
+        failOnError: true,
+    },
 }
