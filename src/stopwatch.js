@@ -4,7 +4,7 @@
  * It does not use any timing function. It only stores Date.now() values when
  * started/paused;
  */
-var Stopwatch = function() {
+module.exports = function() {
     this.running = false;
     // This variable stores the last time the start function was called.
     this.startedAt = 0;

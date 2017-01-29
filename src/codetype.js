@@ -1,3 +1,5 @@
+import Vue from 'vue'
+
 // Visual representation for spaces and line ends;
 var space = '\u02FD'
 var lineEnd = '\u23CE\n'
@@ -13,7 +15,11 @@ var params = '?page=1&per_page=100';
 const maxFileSize = 512;
 
 // Stopwatch to calculate WPM
+var Stopwatch = require('./stopwatch.js');
 var sw = new Stopwatch();
+
+// WPM calculator
+var wpmCalc = require('./wpmCalc.js');
 
 
 /**
@@ -29,7 +35,7 @@ function extractFilesFromGists(gists) {
     var files = [];
     // TODO: Maybe this can be made clearer;
     gists.forEach((el) => {
-        for (file in el.files) {
+        for (var file in el.files) {
             files.push(el.files[file])
         }
     })
@@ -69,7 +75,7 @@ function capFileSize(file) {
  * @returns {string} String with spaces substituted to visual characters.
  */
 function replaceSpaces(input) {
-    output = input.replace(/ /g, space)
+    var output = input.replace(/ /g, space)
                   .replace(/\n/g, lineEnd);
     return output;
 }
@@ -194,8 +200,8 @@ var vm = new Vue({
                 typed: this.typedText.length,
                 left: left,
                 typos: typos,
-                rawWPM: getRawWPM(this.totalTyped, sw.elapsed()),
-                netWPM: getNetWPM(this.totalTyped, typos, sw.elapsed()),
+                rawWPM: wpmCalc.getRawWPM(this.totalTyped, sw.elapsed()),
+                netWPM: wpmCalc.getNetWPM(this.totalTyped, typos, sw.elapsed()),
             }
         }
     },
