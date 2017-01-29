@@ -29,16 +29,16 @@ let wpmCalc = require('./wpmCalc.js');
  * @return {Array} List of all files on all Gists;
  */
 function extractFilesFromGists(gists) {
-    let files = [];
-    // TODO: Maybe this can be made clearer;
-    gists.forEach((el) => {
-        for (let file in el.files) {
-            if (Object.prototype.hasOwnProperty.call(el.files, file)) {
-                files.push(el.files[file]);
-            }
-        }
-    });
-    return files;
+  let files = [];
+  // TODO: Maybe this can be made clearer;
+  gists.forEach((el) => {
+    for (let file in el.files) {
+      if (Object.prototype.hasOwnProperty.call(el.files, file)) {
+        files.push(el.files[file]);
+      }
+    }
+  });
+  return files;
 }
 
 
@@ -49,7 +49,7 @@ function extractFilesFromGists(gists) {
  * @return {boolean} true if the file is NOT plain text.
  */
 function excludeTextFiles(file) {
-    return !/text\/plain/.test(file.type);
+  return !/text\/plain/.test(file.type);
 }
 
 
@@ -60,7 +60,7 @@ function excludeTextFiles(file) {
  * @return {boolean} true if the file is smaller than `maxFileSize`;
  */
 function capFileSize(file) {
-    return file.size <= maxFileSize;
+  return file.size <= maxFileSize;
 }
 
 
@@ -74,9 +74,9 @@ function capFileSize(file) {
  * @return {string} String with spaces substituted to visual characters.
  */
 function replaceSpaces(input) {
-    let output = input.replace(/ /g, space)
-                  .replace(/\n/g, lineEnd);
-    return output;
+  let output = input.replace(/ /g, space)
+          .replace(/\n/g, lineEnd);
+  return output;
 }
 
 
@@ -87,7 +87,7 @@ function replaceSpaces(input) {
  * @return {boolean} true if string has multiple characters.
  */
 function isMultipleChars(typedKey) {
-    return /^.$/.test(typedKey) ? false : true;
+  return /^.$/.test(typedKey) ? false : true;
 }
 
 
@@ -103,25 +103,25 @@ function isMultipleChars(typedKey) {
  * the HTML.
  */
 function verifyTypedKey(currentKey, typedKey) {
-    let correct = typedKey === currentKey;
-    let displayKey;
-    switch (currentKey) {
-        case ' ':
-            displayKey = space;
-            break;
-        case '\n':
-            displayKey = lineEnd;
-            break;
-    default:
-        displayKey = currentKey;
-    }
+  let correct = typedKey === currentKey;
+  let displayKey;
+  switch (currentKey) {
+    case ' ':
+      displayKey = space;
+      break;
+    case '\n':
+      displayKey = lineEnd;
+      break;
+  default:
+    displayKey = currentKey;
+  }
 
-    let verifiedItem = {
-        key: displayKey,
-        correct: correct,
-        classname: correct ? 'correct' : 'typo',
-    };
-    return verifiedItem;
+  let verifiedItem = {
+    key: displayKey,
+    correct: correct,
+    classname: correct ? 'correct' : 'typo',
+  };
+  return verifiedItem;
 }
 
 
@@ -132,8 +132,8 @@ function verifyTypedKey(currentKey, typedKey) {
  * out of focus.
  */
 Vue.component('popup', {
-    template: '#popup-template',
-    props: ['message', 'subtext'],
+  template: '#popup-template',
+  props: ['message', 'subtext'],
 });
 
 
@@ -141,204 +141,204 @@ Vue.component('popup', {
  * Vue.Js View Model
  */
 new Vue({
-    el: '#app',
+  el: '#app',
 
-    created: function() {
-        this.retrieveFilesFromGist();
+  created: function() {
+    this.retrieveFilesFromGist();
+  },
+
+  data: {
+    codeFiles: [],
+    typedText: [],
+    totalTyped: 0,
+    remainingText: null,
+    currentChar: null,
+    active: false,
+    showModal: true,
+  },
+
+  computed: {
+    /**
+     * Returns the remaining text as a joined string.
+     *
+     * @return {String} the remaining text ready for being displayed.
+     */
+    remainingTextDisplay: function() {
+      if (!this.remainingText) {
+        return 'loading...';
+      }
+      let text = this.remainingText.slice(0).reverse().join('');
+      return replaceSpaces(text);
     },
 
-    data: {
-        codeFiles: [],
-        typedText: [],
-        totalTyped: 0,
-        remainingText: null,
-        currentChar: null,
-        active: false,
-        showModal: true,
+    /**
+     * The current char to be typed ready for display.
+     *
+     * @return {String} the current character to be typed, ready for
+     * display;
+     */
+    displayCurrentChar: function() {
+      if (!this.currentChar) return;
+      return replaceSpaces(this.currentChar);
     },
 
-    computed: {
-        /**
-         * Returns the remaining text as a joined string.
-         *
-         * @return {String} the remaining text ready for being displayed.
-         */
-        remainingTextDisplay: function() {
-            if (!this.remainingText) {
-                return 'loading...';
-            }
-            let text = this.remainingText.slice(0).reverse().join('');
-            return replaceSpaces(text);
-        },
+    /**
+     * The computed typing score.
+     *
+     * @return {(string|number)} score.correct - Number of correctly typed
+     * chars;
+     * @return {(string|number)} score.typed - Total typed chars;
+     * @return {(string|number)} score.left - Chars left to be typed;
+     * @return {(string|number)} score.typos - Uncorrected characters;
+     * @return {(string|number)} score.rawWPM - Calculated Raw Words per
+     * Minute;
+     * @return {(string|number)} score.netWPM - Calculated Net Words per
+     * Minute;
+     */
+    score: function() {
+      if (!this.remainingText) {
+        return {
+          correct: '--',
+          typed: '--',
+          left: '--',
+          typos: '--',
+          rawWPM: '--',
+          netWPM: '--',
+        };
+      }
 
-        /**
-         * The current char to be typed ready for display.
-         *
-         * @return {String} the current character to be typed, ready for
-         * display;
-         */
-        displayCurrentChar: function() {
-            if (!this.currentChar) return;
-            return replaceSpaces(this.currentChar);
-        },
+      let left = this.remainingText.length + 1;
+      let correct = this.typedText.filter((el) => el.correct).length;
+      let typos = this.typedText.length - correct;
+      return {
+        correct: correct,
+        typed: this.typedText.length,
+        left: left,
+        typos: typos,
+        rawWPM: wpmCalc.getRawWPM(this.totalTyped, sw.elapsed()),
+        netWPM: wpmCalc.getNetWPM(this.totalTyped, typos, sw.elapsed()),
+      };
+    },
+  },
 
-        /**
-         * The computed typing score.
-         *
-         * @return {(string|number)} score.correct - Number of correctly typed
-         * chars;
-         * @return {(string|number)} score.typed - Total typed chars;
-         * @return {(string|number)} score.left - Chars left to be typed;
-         * @return {(string|number)} score.typos - Uncorrected characters;
-         * @return {(string|number)} score.rawWPM - Calculated Raw Words per
-         * Minute;
-         * @return {(string|number)} score.netWPM - Calculated Net Words per
-         * Minute;
-         */
-        score: function() {
-            if (!this.remainingText) {
-                return {
-                    correct: '--',
-                    typed: '--',
-                    left: '--',
-                    typos: '--',
-                    rawWPM: '--',
-                    netWPM: '--',
-                };
-            }
+  methods: {
+    /**
+     * Populates an array with files with code taken from Gist.
+     *
+     * The Gist files will be available in the `codeFiles` array;
+     *
+     * @param {strings} json - JSON Retrieved from the Github API;
+     */
+    populateExcerptList: function(json) {
+      let gists = JSON.parse(json);
+      let files = extractFilesFromGists(gists);
+      let filtered = files.filter(excludeTextFiles);
+      let capped = filtered.filter(capFileSize);
 
-            let left = this.remainingText.length + 1;
-            let correct = this.typedText.filter((el) => el.correct).length;
-            let typos = this.typedText.length - correct;
-            return {
-                correct: correct,
-                typed: this.typedText.length,
-                left: left,
-                typos: typos,
-                rawWPM: wpmCalc.getRawWPM(this.totalTyped, sw.elapsed()),
-                netWPM: wpmCalc.getNetWPM(this.totalTyped, typos, sw.elapsed()),
-            };
-        },
+      this.codeFiles = capped;
+
+      let file = this.codeFiles.shift();
+      this.retrieveExcerptFromURL(file.raw_url);
     },
 
-    methods: {
-        /**
-         * Populates an array with files with code taken from Gist.
-         *
-         * The Gist files will be available in the `codeFiles` array;
-         *
-         * @param {strings} json - JSON Retrieved from the Github API;
-         */
-        populateExcerptList: function(json) {
-            let gists = JSON.parse(json);
-            let files = extractFilesFromGists(gists);
-            let filtered = files.filter(excludeTextFiles);
-            let capped = filtered.filter(capFileSize);
-
-            this.codeFiles = capped;
-
-            let file = this.codeFiles.shift();
-            this.retrieveExcerptFromURL(file.raw_url);
-        },
-
-        /**
-         * Get a list of Gists through the GitHub API.
-         */
-        retrieveFilesFromGist: function() {
-            let xhr = new XMLHttpRequest();
-            xhr.open('GET', gistURL + params);
-            xhr.onload = () => {
-                this.populateExcerptList(xhr.responseText);
-            };
-            xhr.send(null);
-        },
-
-        /**
-         * Gets the Excerpts text and prepare it for rendering;
-         *
-         * @param {string} url - URL of file from Gist.
-         */
-        retrieveExcerptFromURL: function(url) {
-            let xhr = new XMLHttpRequest();
-            xhr.open('GET', url);
-            xhr.onload = () => {
-                this.remainingText = xhr.responseText
-                                        .slice(1)
-                                        .split('')
-                                        .reverse();
-                this.currentChar = xhr.responseText.charAt(0);
-            };
-            xhr.send(null);
-        },
-
-        /**
-         * Handles input inside the text div.
-         *
-         * @param {Object} event - Event from the Browser
-         */
-        doInput: function(event) {
-            let typedKey = event.key;
-            switch (typedKey) {
-                case 'Enter':
-                    typedKey = '\n';
-                    break;
-                case 'Backspace':
-                    this.doBackspace();
-                    return;
-                default:
-                    if (isMultipleChars(typedKey)) return;
-            }
-            this.totalTyped++;
-
-            let verifyedItem = verifyTypedKey(this.currentChar, typedKey);
-            this.typedText.push(verifyedItem);
-
-            this.currentChar = this.remainingText.pop();
-
-            // TODO: Handle the end of an excerpt
-            // if (!this.currentChar) console.log('Fim?');
-        },
-
-        /**
-         * Handles backspaces.
-         */
-        doBackspace: function() {
-            let item = this.typedText.pop();
-            if (!item) return;
-
-            let backspacedChar = item.key;
-            switch (backspacedChar) {
-                case space:
-                    backspacedChar = ' ';
-                    break;
-                case lineEnd:
-                    backspacedChar = '\n';
-                    break;
-            }
-
-            this.remainingText.push(this.currentChar);
-            this.currentChar = backspacedChar;
-        },
-
-        /**
-         * Run when the main text display gets focused;
-         *
-         * @param {Object} event - Event from the Browser
-         */
-        activate: function(event) {
-            this.showModal = false;
-            sw.start();
-        },
-
-        /**
-         * Run when the main text display gets unfocused;
-         *
-         * @param {Object} event - Event from the Browser
-         */
-        deactivate: function(event) {
-            this.showModal = true;
-            sw.pause();
-        },
+    /**
+     * Get a list of Gists through the GitHub API.
+     */
+    retrieveFilesFromGist: function() {
+      let xhr = new XMLHttpRequest();
+      xhr.open('GET', gistURL + params);
+      xhr.onload = () => {
+        this.populateExcerptList(xhr.responseText);
+      };
+      xhr.send(null);
     },
+
+    /**
+     * Gets the Excerpts text and prepare it for rendering;
+     *
+     * @param {string} url - URL of file from Gist.
+     */
+    retrieveExcerptFromURL: function(url) {
+      let xhr = new XMLHttpRequest();
+      xhr.open('GET', url);
+      xhr.onload = () => {
+        this.remainingText = xhr.responseText
+                    .slice(1)
+                    .split('')
+                    .reverse();
+        this.currentChar = xhr.responseText.charAt(0);
+      };
+      xhr.send(null);
+    },
+
+    /**
+     * Handles input inside the text div.
+     *
+     * @param {Object} event - Event from the Browser
+     */
+    doInput: function(event) {
+      let typedKey = event.key;
+      switch (typedKey) {
+        case 'Enter':
+          typedKey = '\n';
+          break;
+        case 'Backspace':
+          this.doBackspace();
+          return;
+        default:
+          if (isMultipleChars(typedKey)) return;
+      }
+      this.totalTyped++;
+
+      let verifyedItem = verifyTypedKey(this.currentChar, typedKey);
+      this.typedText.push(verifyedItem);
+
+      this.currentChar = this.remainingText.pop();
+
+      // TODO: Handle the end of an excerpt
+      // if (!this.currentChar) console.log('Fim?');
+    },
+
+    /**
+     * Handles backspaces.
+     */
+    doBackspace: function() {
+      let item = this.typedText.pop();
+      if (!item) return;
+
+      let backspacedChar = item.key;
+      switch (backspacedChar) {
+        case space:
+          backspacedChar = ' ';
+          break;
+        case lineEnd:
+          backspacedChar = '\n';
+          break;
+      }
+
+      this.remainingText.push(this.currentChar);
+      this.currentChar = backspacedChar;
+    },
+
+    /**
+     * Run when the main text display gets focused;
+     *
+     * @param {Object} event - Event from the Browser
+     */
+    activate: function(event) {
+      this.showModal = false;
+      sw.start();
+    },
+
+    /**
+     * Run when the main text display gets unfocused;
+     *
+     * @param {Object} event - Event from the Browser
+     */
+    deactivate: function(event) {
+      this.showModal = true;
+      sw.pause();
+    },
+  },
 });
 
