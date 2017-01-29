@@ -14,25 +14,24 @@ module.exports = function() {
     this.start = function() {
         this.running = true;
         this.startedAt = Date.now();
-    }
+    };
 
     this.pause = function() {
         this.running = false;
         this.subTotal += Date.now() - this.startedAt;
-    }
+    };
 
     this.reset = function() {
         this.running = false;
         this.startedAt = 0;
         this.subTotal = 0;
-    }
+    };
 
     this.elapsed = function() {
         if (this.running) {
             return this.subTotal + (Date.now() - this.startedAt);
-        }
-        else {
+        } else {
             return this.subTotal;
         }
-    }
-}
+    };
+};

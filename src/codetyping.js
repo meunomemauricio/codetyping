@@ -1,25 +1,22 @@
-import Vue from 'vue'
+import Vue from 'vue';
 
 // Visual representation for spaces and line ends;
-var space = '\u02FD'
-var lineEnd = '\u23CE\n'
-
-// Specify we're using the Version 3 of the API
-var acceptHeader = 'application/vnd.github.v3+json';
+let space = '\u02FD';
+let lineEnd = '\u23CE\n';
 
 // GitHub API URLs
-var gistURL = 'https://api.github.com/gists/public';
-var params = '?page=1&per_page=100';
+let gistURL = 'https://api.github.com/gists/public';
+let params = '?page=1&per_page=100';
 
 // Max size of files to be used for typing
 const maxFileSize = 512;
 
 // Stopwatch to calculate WPM
-var Stopwatch = require('./stopwatch.js');
-var sw = new Stopwatch();
+let Stopwatch = require('./stopwatch.js');
+let sw = new Stopwatch();
 
 // WPM calculator
-var wpmCalc = require('./wpmCalc.js');
+let wpmCalc = require('./wpmCalc.js');
 
 
 /**
@@ -28,17 +25,19 @@ var wpmCalc = require('./wpmCalc.js');
  * Gists can contain multiple files. This function extracts them to a new
  * array;
  *
- * @params {Array} gists - Array of gists objects retrieved from the API;
- * @returns {Array} List of all files on all Gists;
+ * @param {Array} gists - Array of gists objects retrieved from the API;
+ * @return {Array} List of all files on all Gists;
  */
 function extractFilesFromGists(gists) {
-    var files = [];
+    let files = [];
     // TODO: Maybe this can be made clearer;
     gists.forEach((el) => {
-        for (var file in el.files) {
-            files.push(el.files[file])
+        for (let file in el.files) {
+            if (Object.prototype.hasOwnProperty.call(el.files, file)) {
+                files.push(el.files[file]);
+            }
         }
-    })
+    });
     return files;
 }
 
@@ -46,8 +45,8 @@ function extractFilesFromGists(gists) {
 /**
  * Filter function to exclude Text files from the gists.
  *
- * @params {Object} file - File extracted from the Gists.
- * @returns {boolean} true if the file is NOT plain text.
+ * @param {Object} file - File extracted from the Gists.
+ * @return {boolean} true if the file is NOT plain text.
  */
 function excludeTextFiles(file) {
     return !/text\/plain/.test(file.type);
@@ -57,8 +56,8 @@ function excludeTextFiles(file) {
 /**
  * Filter function to exclude files bigger than `maxFileSize`;
  *
- * @params {Object} file - File extracted from the Gists;
- * @returns {boolean} true if the file is smaller than `maxFileSize`;
+ * @param {Object} file - File extracted from the Gists;
+ * @return {boolean} true if the file is smaller than `maxFileSize`;
  */
 function capFileSize(file) {
     return file.size <= maxFileSize;
@@ -71,11 +70,11 @@ function capFileSize(file) {
  * It's important to give visual feeback for spaces and linebreaks, otherwise
  * it's really easy to get lost when typing them.
  *
- * @params {string} input - Input string to have the spaces substituted.
- * @returns {string} String with spaces substituted to visual characters.
+ * @param {string} input - Input string to have the spaces substituted.
+ * @return {string} String with spaces substituted to visual characters.
  */
 function replaceSpaces(input) {
-    var output = input.replace(/ /g, space)
+    let output = input.replace(/ /g, space)
                   .replace(/\n/g, lineEnd);
     return output;
 }
@@ -85,6 +84,7 @@ function replaceSpaces(input) {
  * Check if the string has multiple characters.
  *
  * @param {string} typedKey - String to be checked against.
+ * @return {boolean} true if string has multiple characters.
  */
 function isMultipleChars(typedKey) {
     return /^.$/.test(typedKey) ? false : true;
@@ -94,17 +94,17 @@ function isMultipleChars(typedKey) {
 /**
  * Check if the used typed the correct key.
  *
- * @params {string} currentKey - The expected key to be typed.
- * @params {string} typedKey - The key typed by the user.
- * @returns {string} verifiedItem.key - Typed key, ready to be displayed.
- * @returns {boolean} verifiedItem.correct - If the typed key was correctly
+ * @param {string} currentKey - The expected key to be typed.
+ * @param {string} typedKey - The key typed by the user.
+ * @return {string} verifiedItem.key - Typed key, ready to be displayed.
+ * @return {boolean} verifiedItem.correct - If the typed key was correctly
  * typed or not;
- * @returns {string} verifiedItem.classname - The proper class to display in
+ * @return {string} verifiedItem.classname - The proper class to display in
  * the HTML.
  */
 function verifyTypedKey(currentKey, typedKey) {
-    var correct = typedKey === currentKey;
-    var displayKey;
+    let correct = typedKey === currentKey;
+    let displayKey;
     switch (currentKey) {
         case ' ':
             displayKey = space;
@@ -116,11 +116,11 @@ function verifyTypedKey(currentKey, typedKey) {
         displayKey = currentKey;
     }
 
-    var verifiedItem = {
+    let verifiedItem = {
         key: displayKey,
         correct: correct,
         classname: correct ? 'correct' : 'typo',
-    }
+    };
     return verifiedItem;
 }
 
@@ -134,16 +134,16 @@ function verifyTypedKey(currentKey, typedKey) {
 Vue.component('popup', {
     template: '#popup-template',
     props: ['message', 'subtext'],
-})
+});
 
 
 /**
  * Vue.Js View Model
  */
-var vm = new Vue({
+new Vue({
     el: '#app',
 
-    created: function () {
+    created: function() {
         this.retrieveFilesFromGist();
     },
 
@@ -160,27 +160,42 @@ var vm = new Vue({
     computed: {
         /**
          * Returns the remaining text as a joined string.
+         *
+         * @return {String} the remaining text ready for being displayed.
          */
-        remainingTextDisplay: function () {
+        remainingTextDisplay: function() {
             if (!this.remainingText) {
-                return "loading...";
+                return 'loading...';
             }
-            var text = this.remainingText.slice(0).reverse().join('');
-            return replaceSpaces(text)
+            let text = this.remainingText.slice(0).reverse().join('');
+            return replaceSpaces(text);
         },
 
         /**
          * The current char to be typed ready for display.
+         *
+         * @return {String} the current character to be typed, ready for
+         * display;
          */
-        displayCurrentChar: function () {
-            if (!this.currentChar) {return;}
+        displayCurrentChar: function() {
+            if (!this.currentChar) return;
             return replaceSpaces(this.currentChar);
         },
 
         /**
          * The computed typing score.
+         *
+         * @return {(string|number)} score.correct - Number of correctly typed
+         * chars;
+         * @return {(string|number)} score.typed - Total typed chars;
+         * @return {(string|number)} score.left - Chars left to be typed;
+         * @return {(string|number)} score.typos - Uncorrected characters;
+         * @return {(string|number)} score.rawWPM - Calculated Raw Words per
+         * Minute;
+         * @return {(string|number)} score.netWPM - Calculated Net Words per
+         * Minute;
          */
-        score: function () {
+        score: function() {
             if (!this.remainingText) {
                 return {
                     correct: '--',
@@ -189,12 +204,12 @@ var vm = new Vue({
                     typos: '--',
                     rawWPM: '--',
                     netWPM: '--',
-                }
+                };
             }
 
-            var left = this.remainingText.length + 1;
-            var correct = this.typedText.filter(function (el) {return el.correct;}).length;
-            var typos = this.typedText.length - correct;
+            let left = this.remainingText.length + 1;
+            let correct = this.typedText.filter((el) => el.correct).length;
+            let typos = this.typedText.length - correct;
             return {
                 correct: correct,
                 typed: this.typedText.length,
@@ -202,8 +217,8 @@ var vm = new Vue({
                 typos: typos,
                 rawWPM: wpmCalc.getRawWPM(this.totalTyped, sw.elapsed()),
                 netWPM: wpmCalc.getNetWPM(this.totalTyped, typos, sw.elapsed()),
-            }
-        }
+            };
+        },
     },
 
     methods: {
@@ -212,50 +227,57 @@ var vm = new Vue({
          *
          * The Gist files will be available in the `codeFiles` array;
          *
-         * @params {strings} json - JSON Retrieved from the Github API;
+         * @param {strings} json - JSON Retrieved from the Github API;
          */
-        populateExcerptList: function (json) {
-            var gists = JSON.parse(json);
-            var files = extractFilesFromGists(gists);
-            var filtered = files.filter(excludeTextFiles);
-            var capped = filtered.filter(capFileSize);
+        populateExcerptList: function(json) {
+            let gists = JSON.parse(json);
+            let files = extractFilesFromGists(gists);
+            let filtered = files.filter(excludeTextFiles);
+            let capped = filtered.filter(capFileSize);
 
             this.codeFiles = capped;
 
-            var file = this.codeFiles.shift();
+            let file = this.codeFiles.shift();
             this.retrieveExcerptFromURL(file.raw_url);
         },
 
         /**
          * Get a list of Gists through the GitHub API.
          */
-        retrieveFilesFromGist: function () {
-            var xhr = new XMLHttpRequest();
+        retrieveFilesFromGist: function() {
+            let xhr = new XMLHttpRequest();
             xhr.open('GET', gistURL + params);
-            xhr.onload = () => {this.populateExcerptList(xhr.responseText);}
+            xhr.onload = () => {
+                this.populateExcerptList(xhr.responseText);
+            };
             xhr.send(null);
         },
 
         /**
          * Gets the Excerpts text and prepare it for rendering;
          *
-         * @params {string} url - URL of file from Gist.
+         * @param {string} url - URL of file from Gist.
          */
         retrieveExcerptFromURL: function(url) {
-            var xhr = new XMLHttpRequest();
+            let xhr = new XMLHttpRequest();
             xhr.open('GET', url);
             xhr.onload = () => {
-                this.remainingText = xhr.responseText.slice(1).split('').reverse();
+                this.remainingText = xhr.responseText
+                                        .slice(1)
+                                        .split('')
+                                        .reverse();
                 this.currentChar = xhr.responseText.charAt(0);
-            }
+            };
             xhr.send(null);
         },
 
         /**
          * Handles input inside the text div.
+         *
+         * @param {Object} event - Event from the Browser
          */
-        doInput: function (event) {
-            var typedKey = event.key;
+        doInput: function(event) {
+            let typedKey = event.key;
             switch (typedKey) {
                 case 'Enter':
                     typedKey = '\n';
@@ -264,25 +286,27 @@ var vm = new Vue({
                     this.doBackspace();
                     return;
                 default:
-                    if (isMultipleChars(typedKey)) {return;}
+                    if (isMultipleChars(typedKey)) return;
             }
             this.totalTyped++;
 
-            var verifyedItem = verifyTypedKey(this.currentChar, typedKey);
+            let verifyedItem = verifyTypedKey(this.currentChar, typedKey);
             this.typedText.push(verifyedItem);
 
             this.currentChar = this.remainingText.pop();
-            if (!this.currentChar){console.log('Fim?');}
+
+            // TODO: Handle the end of an excerpt
+            // if (!this.currentChar) console.log('Fim?');
         },
 
         /**
          * Handles backspaces.
          */
-        doBackspace: function () {
-            var item = this.typedText.pop();
-            if (!item) {return;}
+        doBackspace: function() {
+            let item = this.typedText.pop();
+            if (!item) return;
 
-            var backspacedChar = item.key;
+            let backspacedChar = item.key;
             switch (backspacedChar) {
                 case space:
                     backspacedChar = ' ';
@@ -298,19 +322,23 @@ var vm = new Vue({
 
         /**
          * Run when the main text display gets focused;
+         *
+         * @param {Object} event - Event from the Browser
          */
-        activate: function (event) {
+        activate: function(event) {
             this.showModal = false;
             sw.start();
         },
 
         /**
          * Run when the main text display gets unfocused;
+         *
+         * @param {Object} event - Event from the Browser
          */
-        deactivate: function (event) {
+        deactivate: function(event) {
             this.showModal = true;
             sw.pause();
         },
     },
-})
+});
 

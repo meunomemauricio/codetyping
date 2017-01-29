@@ -15,9 +15,9 @@ module.exports = {
      * @params {number} typed - Total ammount of typed characters;
      * @params {number} elapsed - Total elapsed time (in ms);
      */
-    getRawWPM: function (typed, elapsed) {
-        var value = (typed * 12000) / elapsed;
-        if (!value) {return 0;}
+    getRawWPM: function(typed, elapsed) {
+        let value = (typed * 12000) / elapsed;
+        if (!value) return 0;
         return value;
     },
 
@@ -30,10 +30,10 @@ module.exports = {
      * @params {number} typos - Number of Uncorrected characters;
      * @params {number} elapsed - Total elapsed time (in ms);
      */
-     getNetWPM: function (typed, typos, elapsed) {
-        var value = ((typed / 5) - typos) * 60000 / elapsed;
-        if (!value) {return 0;}
-        else if (value < 0) {return 0;}
+    getNetWPM: function(typed, typos, elapsed) {
+        let value = ((typed / 5) - typos) * 60000 / elapsed;
+        if (!value) return 0;
+        else if (value < 0) return 0;
         return value;
     },
-}
+};
