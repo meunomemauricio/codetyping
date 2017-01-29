@@ -1,8 +1,8 @@
 module.exports = {
-    entry: './src/codetype.js',
+    entry: './src/codetyping.js',
     output: {
         path: './dist',
-        filename: 'codetype.js',
+        filename: 'codetyping.js',
     },
     module: {
         loaders: [

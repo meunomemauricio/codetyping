@@ -21,10 +21,6 @@ module.exports = function(config) {
             'test/unit/index.js',
         ],
 
-        // exclude: [
-        //     'src/codetype.js',
-        // ],
-
         preprocessors: {
             'src/*.js': ['coverage'],
             './test/unit/index.js': ['babel', 'webpack'],
