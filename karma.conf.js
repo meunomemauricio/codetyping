@@ -1,7 +1,4 @@
-var path = require('path'),
-  configSettings,
-  TEST_RESULTS_DIR = 'test-results',
-  COVERAGE_DIR =  path.join(TEST_RESULTS_DIR, 'coverage');
+var path = require('path');
 
 module.exports = function(config) {
   config.set({
