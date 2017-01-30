@@ -41,5 +41,10 @@ module.exports = function(config) {
     webpackMiddleware: {
       noInfo: true
     },
+
+    coverageReporter: {
+      type : 'lcovonly',
+      dir : 'coverage/',
+    },
   })
 }
